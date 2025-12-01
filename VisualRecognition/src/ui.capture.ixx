@@ -35,7 +35,7 @@ namespace ui::detail
     // Dimensions:
     //   width  ≈ 360 px
     //   height ≈ 960 px
-    //   mouse is ~12% from the top → good head/body ratio
+    //   mouse is ~18% from the top → good head/body ratio
     //
     // This sampler ALWAYS returns the same rectangle no matter where the
     // user clicks, and will never offset the anchor when near screen edges.
@@ -44,7 +44,7 @@ namespace ui::detail
     constexpr int captureWidth = 360;
     constexpr int captureHeight = 960;
     constexpr int halfWidth = captureWidth / 2;
-    constexpr float HEAD_POS = 0.12f;
+    constexpr float HEAD_POS = 0.18f;
     constexpr int headOffsetY = static_cast<int>(captureHeight * HEAD_POS);
 
     struct CaptureBounds
