@@ -98,18 +98,61 @@ namespace ui::detail
         CaptureBounds bounds{};
         bounds.desiredLeft = desiredLeft;
         bounds.desiredTop = desiredTop;
-        bounds.left = std::clamp(desiredLeft, virtualScreen.left, virtualScreen.right);
-        bounds.top = std::clamp(desiredTop, virtualScreen.top, virtualScreen.bottom);
-        bounds.right = std::clamp(desiredRight, virtualScreen.left, virtualScreen.right);
-        bounds.bottom = std::clamp(desiredBottom, virtualScreen.top, virtualScreen.bottom);
+
+        const int minLeft = virtualScreen.left;
+        const int maxLeft = virtualScreen.right - captureWidth + 1;
+        const int minTop = virtualScreen.top;
+        const int maxTop = virtualScreen.bottom - captureHeight + 1;
+
+        if (maxLeft < minLeft)
+        {
+            bounds.left = minLeft;
+            bounds.right = bounds.left + captureWidth - 1;
+        }
+        else
+        {
+            bounds.left = std::clamp(desiredLeft, minLeft, maxLeft);
+            bounds.right = bounds.left + captureWidth - 1;
+        }
+
+        if (maxTop < minTop)
+        {
+            bounds.top = minTop;
+            bounds.bottom = bounds.top + captureHeight - 1;
+        }
+        else
+        {
+            bounds.top = std::clamp(desiredTop, minTop, maxTop);
+            bounds.bottom = bounds.top + captureHeight - 1;
+        }
 
         return bounds;
     }
 
     // Coverage for multi-monitor coordinates that cross the primary origin.
-    static_assert(ComputeBounds({ -10, 500 }, MakeVirtualScreen(-1920, 0, 3840, 1080)).left == -190);
-    static_assert(ComputeBounds({ -10, 500 }, MakeVirtualScreen(-1920, 0, 3840, 1080)).width() == captureWidth);
-    static_assert(ComputeBounds({ -1910, 500 }, MakeVirtualScreen(-1920, 0, 3840, 1080)).left == -1920);
+    constexpr auto kWideVirtualScreen = MakeVirtualScreen(-1920, 0, 3840, 1080);
+
+    constexpr auto AnchorOffsetX = [](CursorPoint pt, const CaptureBounds& bounds) constexpr
+    {
+        return pt.x - bounds.left;
+    };
+
+    constexpr auto AnchorOffsetY = [](CursorPoint pt, const CaptureBounds& bounds) constexpr
+    {
+        return pt.y - bounds.top;
+    };
+
+    static_assert(ComputeBounds({ -10, 500 }, kWideVirtualScreen).left == -190);
+    static_assert(ComputeBounds({ -10, 500 }, kWideVirtualScreen).width() == captureWidth);
+    static_assert(ComputeBounds({ -1910, 500 }, kWideVirtualScreen).left == -1920);
+    static_assert(ComputeBounds({ -1910, 500 }, kWideVirtualScreen).width() == captureWidth);
+    static_assert(AnchorOffsetX({ -1910, 500 }, ComputeBounds({ -1910, 500 }, kWideVirtualScreen)) == 10);
+
+    static_assert(ComputeBounds({ 1910, 500 }, kWideVirtualScreen).right == kWideVirtualScreen.right);
+    static_assert(AnchorOffsetX({ 1910, 500 }, ComputeBounds({ 1910, 500 }, kWideVirtualScreen)) == captureWidth - 10);
+
+    static_assert(ComputeBounds({ 0, kWideVirtualScreen.bottom - 5 }, kWideVirtualScreen).bottom == kWideVirtualScreen.bottom);
+    static_assert(AnchorOffsetY({ 0, kWideVirtualScreen.bottom - 5 }, ComputeBounds({ 0, kWideVirtualScreen.bottom - 5 }, kWideVirtualScreen)) == captureHeight - 6);
 
     std::optional<Capture> CapturePatchAroundCursor()
     {
