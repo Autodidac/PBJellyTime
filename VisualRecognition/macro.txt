@@ -1,8 +1,2 @@
-M,1611,1075,1618,1082,2208,1200,1,439,HwndWrapper[DefaultDomain;;3db01113-eb75-4024-a9f5-621838e681b0]|VisualRecognition (Running) - vr.macro.types.ixx - Microsoft Visual Studio
-M,1611,1075,1618,1082,2208,1200,0,95,HwndWrapper[DefaultDomain;;3db01113-eb75-4024-a9f5-621838e681b0]|VisualRecognition (Running) - vr.macro.types.ixx - Microsoft Visual Studio
-M,2047,1132,2054,1139,2208,1200,1,334,HwndWrapper[DefaultDomain;;3db01113-eb75-4024-a9f5-621838e681b0]|VisualRecognition (Running) - vr.macro.types.ixx - Microsoft Visual Studio
-M,2047,1132,2054,1139,2208,1200,0,97,HwndWrapper[DefaultDomain;;3db01113-eb75-4024-a9f5-621838e681b0]|VisualRecognition (Running) - vr.macro.types.ixx - Microsoft Visual Studio
-M,1684,1491,1684,1491,0,0,1,219
-M,1684,1491,1684,1491,0,0,0,134
-M,1138,607,878,347,1024,768,1,1722,VisualRecognition_Main|Visual Recognition + Macro
-M,1138,607,878,347,1024,768,0,110,VisualRecognition_Main|Visual Recognition + Macro
+M,4996,374,372,113,1024,768,1,65,VisualRecognition_Main|Visual Recognition + Macro
+M,4996,374,372,113,1024,768,0,104,VisualRecognition_Main|Visual Recognition + Macro
