@@ -5,7 +5,7 @@ VisualRecognition is a Windows desktop utility that records portrait-sized scree
 ## Features
 - Global hooks for quick actions: left-click to capture anywhere outside the UI, and low-level hotkeys (**F7** record, **F8** clear, **F9** play/stop, **F6** exit) to drive the macro engine even when the app is unfocused.
 - Patch preview with simple status messaging and a live mouse-coordinate indicator so you can see exactly where captures and macro mouse events will land.
-- Portrait captures: a fixed 360×960 BGRA32 frame with the cursor ~12% from the top. Pixels are clamped at screen edges so every capture stays full-sized.
+- Portrait captures: a fixed 360×960 BGRA32 frame with the cursor ~18% from the top. Pixels are clamped at screen edges so every capture stays full-sized.
 - One-click learning: add a labeled patch, persist it to `pixelai_examples.bin`, and keep timestamped backups beside the model file according to the `BackupRetention` setting in `pixelai.ini`.
 - Delete captures directly from the history list, removing the on-disk `.bin` entry when present.
 - Reset the UI instantly with **Clear preview**, which wipes the on-screen image, clears capture history, and cleans up any saved capture files.
