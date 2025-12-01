@@ -7,6 +7,8 @@ module;
 #include <algorithm>
 #include <string>
 #include <cstring>  // for std::memcpy
+#include <cstdint>
+#include <vector>
 
 export module ui:layout;
 
@@ -287,6 +289,14 @@ namespace ui::detail
         const int w = cap->width;
         const int h = cap->height;
 
+        // Normalize the capture buffer to the BGRA format expected by GDI
+        std::vector<std::uint32_t> normalized;
+        normalized.reserve(static_cast<std::size_t>(w) * static_cast<std::size_t>(h));
+        for (std::uint32_t px : cap->pixels)
+        {
+            normalized.push_back(px | 0xFF000000u);
+        }
+
         BITMAPINFO bmi{};
         bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
         bmi.bmiHeader.biWidth = w;
@@ -307,7 +317,7 @@ namespace ui::detail
 
         const std::size_t bytes =
             static_cast<std::size_t>(w) * static_cast<std::size_t>(h) * 4u;
-        std::memcpy(bits, cap->pixels.data(), bytes);
+        std::memcpy(bits, normalized.data(), bytes);
 
         HDC hdcMem = ::CreateCompatibleDC(hdc);
         HGDIOBJ old = ::SelectObject(hdcMem, hbm);
@@ -315,10 +325,21 @@ namespace ui::detail
         const int dstW = rc.right - rc.left;
         const int dstH = rc.bottom - rc.top;
 
+        // Preserve aspect ratio inside the preview area (letterbox)
+        const double scaleX = static_cast<double>(dstW) / static_cast<double>(w);
+        const double scaleY = static_cast<double>(dstH) / static_cast<double>(h);
+        const double scale = (std::min)(scaleX, scaleY);
+
+        const int drawW = static_cast<int>(std::lround(static_cast<double>(w) * scale));
+        const int drawH = static_cast<int>(std::lround(static_cast<double>(h) * scale));
+
+        const int offsetX = rc.left + (dstW - drawW) / 2;
+        const int offsetY = rc.top + (dstH - drawH) / 2;
+
         ::SetStretchBltMode(hdc, HALFTONE);
         ::StretchBlt(
             hdc,
-            rc.left, rc.top, dstW, dstH,
+            offsetX, offsetY, drawW, drawH,
             hdcMem,
             0, 0, w, h,
             SRCCOPY);
