@@ -1,0 +1,2 @@
+M,1094,530,886,322,1024,768,1,299,VisualRecognition_Main|Visual Recognition + Macro
+M,1094,530,886,322,1024,768,0,110,VisualRecognition_Main|Visual Recognition + Macro
