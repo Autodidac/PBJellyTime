@@ -1,16 +1,18 @@
 # Contributor Quickstart: Runtime Flow
 
-This guide summarizes how the app runs so you can trace code paths quickly when making changes.
+This guide summarizes how the app runs so you can trace code paths quickly when making changes. External contributions are not
+accepted; this document exists for existing maintainers.
 
 ## Startup sequence
 - **Settings**: `pixelai.ini` is read from the executable directory if present. The app runs with built-in defaults when the file is missing or malformed.
 - **History**: Capture history starts empty on launch. New captures are added in-memory as you record them.
 - **Model**: The recognizer loads `pixelai_examples.bin` beside the executable when it exists. Missing models simply disable classification until you learn and save examples.
+- **Storage paths**: Everything lives beside the executable: captures are written to `captures/`, the primary model is `pixelai_examples.bin`, and timestamped backups live next to the model file when saves succeed.
 
 ## Capture pipeline
 - **Global mouse hook**: A low-level mouse hook watches for `WM_LBUTTONUP` outside the app window and posts a capture message so you can record without focusing the app.
 - **Patch acquisition**: `CapturePatchAroundCursor()` produces a fixed 360×960 BGRA portrait frame anchored near the cursor (~18% from the top) and clamps at screen edges so the frame stays full-sized.
-- **History entry**: Successful captures are appended to in-memory history, selected immediately, and written as BMPs to `captures/` beside the executable (unique names per capture). The preview invalidates to show the latest patch, and the status bar reflects success or failure.
+- **History entry**: Successful captures are appended to in-memory history, selected immediately, and written as BMPs to `captures/` beside the executable (unique names per capture). The preview invalidates to show the latest patch, and the status bar reflects success or failure, mirroring what is persisted on disk.
 
 ## Classification flow
 - **UI-driven**: Classification runs from the Classify button in the app (no global F5 hook). The handler reuses the `DoClassify()` flow.

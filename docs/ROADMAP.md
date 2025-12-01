@@ -1,11 +1,10 @@
 # Roadmap and Next Steps
 
 ## Current State
-- Win32 UI (`src/ui.ixx`) captures a 360×960 portrait patch anchored to the cursor, writes each capture to `captures/`, and displays it in a preview area.
-- Global mouse hook captures on left click even when the app is unfocused, while classification is currently UI-only via the Classify button (no global hotkey).
-- The `PixelRecognizer` (`src/pixelai.ixx`) stores labeled patches, performs cosine-similarity matching, and saves/loads models to `pixelai_examples.bin`.
-- Learning flow prompts for a label, trains in-memory, and attempts to persist the model immediately.
-- Timestamped backups of `pixelai_examples.bin` are written alongside the model file and trimmed according to the `BackupRetention` setting in `pixelai.ini`.
+- Win32 UI (`src/ui.ixx`) captures a 360×960 portrait patch anchored to the cursor (~18% from the top), writes each capture as a BMP into `captures/` beside the executable, and displays it in a preview area.
+- A global mouse hook triggers captures on left click even when the app is unfocused, while classification remains UI-only via the Classify button (no global F5 hook).
+- The `PixelRecognizer` (`src/pixelai.ixx`) stores labeled patches, performs cosine-similarity matching, and saves/loads models to `pixelai_examples.bin` alongside the executable.
+- Learning flow prompts for a label, trains in-memory, writes timestamped backups next to the model file, and attempts to persist the updated `pixelai_examples.bin` immediately.
 - Startup loads `pixelai_examples.bin`, creating a placeholder file when none exists and surfacing load failures through the status bar and dialogs.
 
 ## Immediate Opportunities

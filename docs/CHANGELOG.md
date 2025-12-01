@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.6
+- Refreshed Contributor Quickstart and the Roadmap to align on the current capture format (360×960 portrait frames), on-disk storage paths (`captures/`, `pixelai_examples.bin` plus backups), and the global mouse hook versus UI-only classification behavior.
+- Clarified in the README that external contributions are not accepted.
+
 ## 0.1.5
 - Corrected README to reflect the current capture format (360×960 portrait frames saved to `captures/`), the macro hotkeys (**F6**–**F9**), and the lack of a global F5 classification hook.
 
