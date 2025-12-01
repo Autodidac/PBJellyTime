@@ -1,11 +1,15 @@
 module;
 #define NOMINMAX
 #include <windows.h>
+#include <shellscalingapi.h>
 #include "ids.hpp"
+
+#pragma comment(lib, "Shcore.lib")
 
 #include <algorithm>
 #include <atomic>
 #include <chrono>
+#include <cmath>
 #include <cstdint>
 #include <cstring>
 #include <filesystem>
@@ -154,6 +158,56 @@ namespace ui::detail
     static_assert(ComputeBounds({ 0, kWideVirtualScreen.bottom - 5 }, kWideVirtualScreen).bottom == kWideVirtualScreen.bottom);
     static_assert(AnchorOffsetY({ 0, kWideVirtualScreen.bottom - 5 }, ComputeBounds({ 0, kWideVirtualScreen.bottom - 5 }, kWideVirtualScreen)) == captureHeight - 6);
 
+    struct DpiScale
+    {
+        double x{ 1.0 };
+        double y{ 1.0 };
+    };
+
+    DpiScale GetMonitorScaleForPoint(const POINT& pt)
+    {
+        const HMONITOR monitor = ::MonitorFromPoint(pt, MONITOR_DEFAULTTONEAREST);
+        if (!monitor)
+            return {};
+
+        UINT dpiX = USER_DEFAULT_SCREEN_DPI;
+        UINT dpiY = USER_DEFAULT_SCREEN_DPI;
+        if (SUCCEEDED(::GetDpiForMonitor(monitor, MDT_EFFECTIVE_DPI, &dpiX, &dpiY)))
+        {
+            return DpiScale
+            {
+                static_cast<double>(dpiX) / USER_DEFAULT_SCREEN_DPI,
+                static_cast<double>(dpiY) / USER_DEFAULT_SCREEN_DPI,
+            };
+        }
+
+        return {};
+    }
+
+    void TranslateToPhysicalPixelsIfUnaware(POINT& pt, VirtualScreen& screen)
+    {
+        const auto awareness = ::GetAwarenessFromDpiAwarenessContext(::GetThreadDpiAwarenessContext());
+        if (awareness != DPI_AWARENESS_UNAWARE)
+            return;
+
+        const DpiScale scale = GetMonitorScaleForPoint(pt);
+        if (scale.x == 1.0 && scale.y == 1.0)
+            return;
+
+        const auto scaleValue = [](int value, double factor)
+        {
+            return static_cast<int>(std::lround(value * factor));
+        };
+
+        pt.x = scaleValue(pt.x, scale.x);
+        pt.y = scaleValue(pt.y, scale.y);
+
+        screen.left = scaleValue(screen.left, scale.x);
+        screen.right = scaleValue(screen.right, scale.x);
+        screen.top = scaleValue(screen.top, scale.y);
+        screen.bottom = scaleValue(screen.bottom, scale.y);
+    }
+
     std::optional<Capture> CapturePatchAroundCursor()
     {
         POINT pt{};
@@ -171,7 +225,10 @@ namespace ui::detail
             virtualWidth,
             virtualHeight);
 
-        const auto bounds = ComputeBounds({ pt.x, pt.y }, virtualScreen);
+        VirtualScreen physicalScreen = virtualScreen;
+        TranslateToPhysicalPixelsIfUnaware(pt, physicalScreen);
+
+        const auto bounds = ComputeBounds({ pt.x, pt.y }, physicalScreen);
         const int w = bounds.width();
         const int h = bounds.height();
 
